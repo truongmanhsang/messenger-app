@@ -1,0 +1,58 @@
+/* ===== CUSTOM MESSENGER CSS ===== */
+
+/* 1. Ẩn Stories */
+/* div[aria-label*="Stories" i],
+div[aria-label*="Tin" i] {
+    display: none !important;
+} */
+
+/* 2. Ẩn sidebar bên trái (danh sách chat) */
+/* div[role="navigation"] {
+    display: none !important;
+} */
+
+/* 3. Làm conversation chiếm full width */
+/* div[role="main"] {
+    width: 100% !important;
+    max-width: 100% !important;
+} */
+
+/* 4. Ẩn search bar */
+/* input[placeholder*="Search" i],
+input[placeholder*="Tìm" i] {
+    display: none !important;
+} */
+
+/* 5. Ẩn quảng cáo */
+div[data-pagelet*="ad" i],
+div[id*="ad" i],
+div[class*="sponsored" i] {
+    display: none !important;
+}
+
+/* 6. Thu nhỏ header */
+/* div[role="banner"] {
+    height: 50px !important;
+    min-height: 50px !important;
+} */
+
+/* 7. Tối ưu padding */
+/* div[role="main"]>div {
+    padding: 8px !important;
+} */
+
+/* 8. Ẩn các button không cần thiết ở header */
+/* div[role="banner"] button[aria-label*="Settings" i],
+div[role="banner"] button[aria-label*="Cài đặt" i] {
+    display: none !important;
+} */
+
+/* 9. Thu nhỏ message bubble */
+/* div[role="row"] {
+    margin: 4px 0 !important;
+} */
+
+/* 10. THÊM CSS CỦA BẠN Ở ĐÂY */
+.x9f619.x1n2onr6.x1ja2u2z.x78zum5.xdt5ytf.x2lah0s.x193iq5w.xat24cr {
+    display: none !important;
+}
