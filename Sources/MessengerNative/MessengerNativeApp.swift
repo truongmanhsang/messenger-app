@@ -91,12 +91,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         UNUserNotificationCenter.current().delegate = self
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            NotificationPresenter.show(
-                title: "Messenger",
-                body: "Notifications are enabled."
-            )
-        }
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
