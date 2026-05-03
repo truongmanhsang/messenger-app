@@ -157,9 +157,18 @@ struct WebView: NSViewRepresentable {
             (function() {
                 const headerHeights = new Set([44, 48, 50, 52, 56, 60, 64]);
                 const isHeaderOffset = value => headerHeights.has(Math.round(parseFloat(value) || 0));
+                const shellMarker = 'nativeMessengerShell';
 
                 function forceStyle(element, property, value) {
                     element.style.setProperty(property, value, 'important');
+                }
+
+                function isVisiblePageContainer(element) {
+                    const rect = element.getBoundingClientRect();
+                    return rect.width >= window.innerWidth * 0.75
+                        && rect.height >= window.innerHeight * 0.35
+                        && rect.top <= 80
+                        && rect.bottom > window.innerHeight * 0.45;
                 }
 
                 function collapseMessengerHeader() {
@@ -176,33 +185,70 @@ struct WebView: NSViewRepresentable {
                         forceStyle(header, 'overflow', 'hidden');
                     });
 
-                    document.querySelectorAll('body *').forEach(element => {
-                        const style = getComputedStyle(element);
-                        const rect = element.getBoundingClientRect();
-                        const isPageSized = rect.width >= window.innerWidth * 0.75
-                            && rect.height >= window.innerHeight * 0.5;
-                        const hasHeaderTop = isHeaderOffset(style.top)
-                            || isHeaderOffset(style.marginTop)
-                            || isHeaderOffset(style.paddingTop)
-                            || (rect.top >= 44 && rect.top <= 64 && isPageSized);
+                    const candidates = Array.from(document.querySelectorAll('body *'))
+                        .map(element => {
+                            const style = getComputedStyle(element);
+                            const rect = element.getBoundingClientRect();
+                            const isPageSized = rect.width >= window.innerWidth * 0.75
+                                && rect.height >= window.innerHeight * 0.5;
+                            const hasHeaderTop = isHeaderOffset(style.top)
+                                || isHeaderOffset(style.marginTop)
+                                || isHeaderOffset(style.paddingTop)
+                                || (rect.top >= 44 && rect.top <= 64 && isPageSized);
 
-                        if (!isPageSized || !hasHeaderTop) return;
+                            return { element, style, rect, isPageSized, hasHeaderTop };
+                        })
+                        .filter(candidate => candidate.isPageSized && candidate.hasHeaderTop)
+                        .sort((a, b) => {
+                            const areaA = a.rect.width * a.rect.height;
+                            const areaB = b.rect.width * b.rect.height;
+                            return areaB - areaA;
+                        });
 
-                        forceStyle(element, 'top', '0px');
-                        forceStyle(element, 'margin-top', '0px');
-                        forceStyle(element, 'padding-top', '0px');
+                    const shell = candidates[0]?.element || document.querySelector('[data-' + shellMarker + '="true"]');
 
-                        if (style.position === 'fixed' || style.position === 'absolute') {
-                            forceStyle(element, 'bottom', '0px');
-                            forceStyle(element, 'height', 'auto');
-                            forceStyle(element, 'min-height', '0px');
-                            forceStyle(element, 'max-height', 'none');
-                        } else if (style.height.includes('calc')) {
-                            forceStyle(element, 'height', 'auto');
-                            forceStyle(element, 'min-height', '0px');
-                            forceStyle(element, 'max-height', 'none');
+                    document.querySelectorAll('[data-' + shellMarker + '="true"]').forEach(element => {
+                        if (element !== shell) {
+                            element.removeAttribute('data-' + shellMarker);
                         }
                     });
+
+                    if (shell) {
+                        shell.setAttribute('data-' + shellMarker, 'true');
+                    }
+
+                    document.querySelectorAll('[data-' + shellMarker + '="true"]').forEach(element => {
+                        const style = getComputedStyle(element);
+                        forceStyle(element, 'top', '0px');
+                        forceStyle(element, 'bottom', '0px');
+                        forceStyle(element, 'margin-top', '0px');
+                        forceStyle(element, 'padding-top', '0px');
+                        forceStyle(element, 'min-height', '0px');
+                        forceStyle(element, 'max-height', 'none');
+
+                        if (style.position === 'fixed' || style.position === 'absolute' || style.height.includes('calc')) {
+                            forceStyle(element, 'height', 'calc(100vh - 0px)');
+                        }
+
+                        if (style.position === 'static') {
+                            forceStyle(element, 'position', 'relative');
+                        }
+                    });
+
+                    Array.from(document.querySelectorAll('body *'))
+                        .filter(isVisiblePageContainer)
+                        .forEach(element => {
+                            const rect = element.getBoundingClientRect();
+                            const footerGap = Math.round(window.innerHeight - rect.bottom);
+
+                            if (footerGap < 8 || footerGap > 96) return;
+
+                            forceStyle(element, 'height', Math.ceil(rect.height + footerGap) + 'px');
+                            forceStyle(element, 'min-height', Math.ceil(rect.height + footerGap) + 'px');
+                            forceStyle(element, 'max-height', 'none');
+                            forceStyle(element, 'padding-bottom', '0px');
+                            forceStyle(element, 'margin-bottom', '0px');
+                        });
                 }
 
                 if (window.__nativeMessengerShellFixInstalled) {

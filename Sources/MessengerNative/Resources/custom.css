@@ -83,10 +83,24 @@ body:has(div[role="banner"]) [style*="padding-top:56px"] {
 
 body:has(div[role="banner"]) [style*="height: calc(100vh - 56px)"],
 body:has(div[role="banner"]) [style*="height:calc(100vh - 56px)"],
+body:has(div[role="banner"]) [style*="height: calc(100% - 56px)"],
+body:has(div[role="banner"]) [style*="height:calc(100% - 56px)"],
 body:has(div[role="banner"]) [style*="min-height: calc(100vh - 56px)"],
-body:has(div[role="banner"]) [style*="min-height:calc(100vh - 56px)"] {
+body:has(div[role="banner"]) [style*="min-height:calc(100vh - 56px)"],
+body:has(div[role="banner"]) [style*="min-height: calc(100% - 56px)"],
+body:has(div[role="banner"]) [style*="min-height:calc(100% - 56px)"] {
     bottom: 0 !important;
-    height: auto !important;
+    height: 100vh !important;
+    min-height: 0 !important;
+    max-height: none !important;
+}
+
+[data-native-messenger-shell="true"] {
+    top: 0 !important;
+    bottom: 0 !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    height: 100vh !important;
     min-height: 0 !important;
     max-height: none !important;
 }
