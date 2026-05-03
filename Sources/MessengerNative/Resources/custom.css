@@ -70,27 +70,27 @@ body {
     padding-top: 0 !important;
 }
 
-body:has(div[role="banner"]) [style*="top: 56px"],
-body:has(div[role="banner"]) [style*="top:56px"],
-body:has(div[role="banner"]) [style*="margin-top: 56px"],
-body:has(div[role="banner"]) [style*="margin-top:56px"],
-body:has(div[role="banner"]) [style*="padding-top: 56px"],
-body:has(div[role="banner"]) [style*="padding-top:56px"] {
+[style*="top: 56px"],
+[style*="top:56px"],
+[style*="margin-top: 56px"],
+[style*="margin-top:56px"],
+[style*="padding-top: 56px"],
+[style*="padding-top:56px"] {
     top: 0 !important;
     margin-top: 0 !important;
     padding-top: 0 !important;
 }
 
-body:has(div[role="banner"]) [style*="height: calc(100vh - 56px)"],
-body:has(div[role="banner"]) [style*="height:calc(100vh - 56px)"],
-body:has(div[role="banner"]) [style*="height: calc(100% - 56px)"],
-body:has(div[role="banner"]) [style*="height:calc(100% - 56px)"],
-body:has(div[role="banner"]) [style*="min-height: calc(100vh - 56px)"],
-body:has(div[role="banner"]) [style*="min-height:calc(100vh - 56px)"],
-body:has(div[role="banner"]) [style*="min-height: calc(100% - 56px)"],
-body:has(div[role="banner"]) [style*="min-height:calc(100% - 56px)"] {
+[style*="height: calc(100vh - 56px)"],
+[style*="height:calc(100vh - 56px)"],
+[style*="height: calc(100% - 56px)"],
+[style*="height:calc(100% - 56px)"],
+[style*="min-height: calc(100vh - 56px)"],
+[style*="min-height:calc(100vh - 56px)"],
+[style*="min-height: calc(100% - 56px)"],
+[style*="min-height:calc(100% - 56px)"] {
     bottom: 0 !important;
-    height: 100vh !important;
+    height: calc(100vh - 0px) !important;
     min-height: 0 !important;
     max-height: none !important;
 }
@@ -100,7 +100,7 @@ body:has(div[role="banner"]) [style*="min-height:calc(100% - 56px)"] {
     bottom: 0 !important;
     margin-top: 0 !important;
     padding-top: 0 !important;
-    height: 100vh !important;
+    height: calc(100vh - 0px) !important;
     min-height: 0 !important;
     max-height: none !important;
 }

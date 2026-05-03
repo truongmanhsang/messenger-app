@@ -30,6 +30,11 @@ struct MessengerNativeApp: App {
                 }
                 .keyboardShortcut("c", modifiers: [.command, .shift])
 
+                Button("Debug Layout") {
+                    NotificationCenter.default.post(name: .debugMessengerLayout, object: nil)
+                }
+                .keyboardShortcut("d", modifiers: [.command, .shift])
+
                 Divider()
 
                 Button("Set Custom Domain") {
