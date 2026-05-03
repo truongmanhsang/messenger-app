@@ -171,6 +171,7 @@ struct WebView: NSViewRepresentable {
                 const shellMarker = 'native-messenger-shell';
 
                 function forceStyle(element, property, value) {
+                    if (element.style.getPropertyValue(property) === value) return;
                     element.style.setProperty(property, value, 'important');
                 }
 
@@ -184,9 +185,13 @@ struct WebView: NSViewRepresentable {
 
                             if (!calcPattern.test(value)) return;
 
+                            const cssProperty = property.replace(/[A-Z]/g, match => '-' + match.toLowerCase());
+                            const nextValue = value.replace(calcPattern, 'calc($1 - 0px)');
+                            if (element.style.getPropertyValue(cssProperty) === nextValue) return;
+
                             element.style.setProperty(
-                                property.replace(/[A-Z]/g, match => '-' + match.toLowerCase()),
-                                value.replace(calcPattern, 'calc($1 - 0px)'),
+                                cssProperty,
+                                nextValue,
                                 'important'
                             );
                         });
@@ -214,12 +219,16 @@ struct WebView: NSViewRepresentable {
                         if (!isHeaderPaneGap && !isMainPaneGap) return;
 
                         const height = Math.ceil(rect.height + footerGap) + 'px';
+                        const previousHeight = element.getAttribute('data-native-footer-fill-height');
+
+                        if (previousHeight === height) return;
 
                         forceStyle(element, 'height', height);
                         forceStyle(element, 'min-height', height);
                         forceStyle(element, 'max-height', 'none');
                         forceStyle(element, 'padding-bottom', '0px');
                         forceStyle(element, 'margin-bottom', '0px');
+                        element.setAttribute('data-native-footer-fill-height', height);
                     }));
                 }
 
@@ -265,7 +274,7 @@ struct WebView: NSViewRepresentable {
                         }
                     });
 
-                    if (shell) {
+                    if (shell && shell.getAttribute('data-' + shellMarker) !== 'true') {
                         shell.setAttribute('data-' + shellMarker, 'true');
                     }
 
@@ -309,13 +318,20 @@ struct WebView: NSViewRepresentable {
 
                 new MutationObserver(scheduleCollapse).observe(document.documentElement, {
                     subtree: true,
-                    childList: true,
-                    attributes: true,
-                    attributeFilter: ['class', 'style', 'role', 'aria-label']
+                    childList: true
+                });
+
+                window.addEventListener('resize', () => {
+                    document.querySelectorAll('[data-native-footer-fill-height]').forEach(element => {
+                        element.removeAttribute('data-native-footer-fill-height');
+                    });
+                    scheduleCollapse();
                 });
 
                 collapseMessengerHeader();
-                window.setInterval(collapseMessengerHeader, 1000);
+                window.setTimeout(collapseMessengerHeader, 250);
+                window.setTimeout(collapseMessengerHeader, 1000);
+                window.setTimeout(collapseMessengerHeader, 2500);
             })();
             """
 
