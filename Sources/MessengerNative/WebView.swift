@@ -74,6 +74,7 @@ struct WebView: NSViewRepresentable {
 
         @objc private func reloadCSS() {
             injectCustomCSS()
+            injectMessengerShellFix()
         }
 
         @objc private func loadCurrentDomain() {
@@ -87,6 +88,7 @@ struct WebView: NSViewRepresentable {
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             injectCustomCSS()
+            injectMessengerShellFix()
             injectNotificationHook()
         }
 
@@ -144,6 +146,90 @@ struct WebView: NSViewRepresentable {
                 style.id = 'native-custom-css';
                 style.textContent = `\(escapedCSS)`;
                 document.documentElement.appendChild(style);
+            })();
+            """
+
+            webView?.evaluateJavaScript(script)
+        }
+
+        private func injectMessengerShellFix() {
+            let script = """
+            (function() {
+                const headerHeights = new Set([44, 48, 50, 52, 56, 60, 64]);
+                const isHeaderOffset = value => headerHeights.has(Math.round(parseFloat(value) || 0));
+
+                function forceStyle(element, property, value) {
+                    element.style.setProperty(property, value, 'important');
+                }
+
+                function collapseMessengerHeader() {
+                    forceStyle(document.documentElement, 'height', '100%');
+                    forceStyle(document.body, 'height', '100%');
+                    forceStyle(document.body, 'padding-top', '0px');
+                    forceStyle(document.body, 'margin-top', '0px');
+
+                    document.querySelectorAll('[role="banner"]').forEach(header => {
+                        forceStyle(header, 'display', 'none');
+                        forceStyle(header, 'height', '0px');
+                        forceStyle(header, 'min-height', '0px');
+                        forceStyle(header, 'max-height', '0px');
+                        forceStyle(header, 'overflow', 'hidden');
+                    });
+
+                    document.querySelectorAll('body *').forEach(element => {
+                        const style = getComputedStyle(element);
+                        const rect = element.getBoundingClientRect();
+                        const isPageSized = rect.width >= window.innerWidth * 0.75
+                            && rect.height >= window.innerHeight * 0.5;
+                        const hasHeaderTop = isHeaderOffset(style.top)
+                            || isHeaderOffset(style.marginTop)
+                            || isHeaderOffset(style.paddingTop)
+                            || (rect.top >= 44 && rect.top <= 64 && isPageSized);
+
+                        if (!isPageSized || !hasHeaderTop) return;
+
+                        forceStyle(element, 'top', '0px');
+                        forceStyle(element, 'margin-top', '0px');
+                        forceStyle(element, 'padding-top', '0px');
+
+                        if (style.position === 'fixed' || style.position === 'absolute') {
+                            forceStyle(element, 'bottom', '0px');
+                            forceStyle(element, 'height', 'auto');
+                            forceStyle(element, 'min-height', '0px');
+                            forceStyle(element, 'max-height', 'none');
+                        } else if (style.height.includes('calc')) {
+                            forceStyle(element, 'height', 'auto');
+                            forceStyle(element, 'min-height', '0px');
+                            forceStyle(element, 'max-height', 'none');
+                        }
+                    });
+                }
+
+                if (window.__nativeMessengerShellFixInstalled) {
+                    collapseMessengerHeader();
+                    return;
+                }
+
+                window.__nativeMessengerShellFixInstalled = true;
+                let scheduled = false;
+                const scheduleCollapse = () => {
+                    if (scheduled) return;
+                    scheduled = true;
+                    requestAnimationFrame(() => {
+                        scheduled = false;
+                        collapseMessengerHeader();
+                    });
+                };
+
+                new MutationObserver(scheduleCollapse).observe(document.documentElement, {
+                    subtree: true,
+                    childList: true,
+                    attributes: true,
+                    attributeFilter: ['class', 'style', 'role', 'aria-label']
+                });
+
+                collapseMessengerHeader();
+                window.setInterval(collapseMessengerHeader, 1000);
             })();
             """
 

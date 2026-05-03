@@ -52,7 +52,49 @@ div[role="banner"] button[aria-label*="Cài đặt" i] {
     margin: 4px 0 !important;
 } */
 
-/* 10. THÊM CSS CỦA BẠN Ở ĐÂY */
-.x9f619.x1n2onr6.x1ja2u2z.x78zum5.xdt5ytf.x2lah0s.x193iq5w.xat24cr {
+/* 10. Hide the Facebook shell header and let messages use the full window. */
+div[role="banner"],
+div[aria-label="Facebook"][role="banner"],
+div[aria-label="Meta"][role="banner"] {
     display: none !important;
+}
+
+html,
+body,
+#facebook {
+    height: 100% !important;
+    overflow: hidden !important;
+}
+
+body {
+    padding-top: 0 !important;
+}
+
+body:has(div[role="banner"]) [style*="top: 56px"],
+body:has(div[role="banner"]) [style*="top:56px"],
+body:has(div[role="banner"]) [style*="margin-top: 56px"],
+body:has(div[role="banner"]) [style*="margin-top:56px"],
+body:has(div[role="banner"]) [style*="padding-top: 56px"],
+body:has(div[role="banner"]) [style*="padding-top:56px"] {
+    top: 0 !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+body:has(div[role="banner"]) [style*="height: calc(100vh - 56px)"],
+body:has(div[role="banner"]) [style*="height:calc(100vh - 56px)"],
+body:has(div[role="banner"]) [style*="min-height: calc(100vh - 56px)"],
+body:has(div[role="banner"]) [style*="min-height:calc(100vh - 56px)"] {
+    bottom: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+}
+
+div[role="banner"] ~ div,
+div[role="main"],
+div[role="main"] > div {
+    top: 0 !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
 }
