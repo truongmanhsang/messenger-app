@@ -37,6 +37,13 @@ struct MessengerNativeApp: App {
 
                 Divider()
 
+                Button("Logout") {
+                    NotificationCenter.default.post(name: .logoutWebView, object: nil)
+                }
+                .keyboardShortcut("l", modifiers: [.command, .shift])
+
+                Divider()
+
                 Button("Set Custom Domain") {
                     appState.showDomainSheet = true
                 }

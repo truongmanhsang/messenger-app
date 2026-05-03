@@ -69,6 +69,13 @@ struct WebView: NSViewRepresentable {
 
             NotificationCenter.default.addObserver(
                 self,
+                selector: #selector(logout),
+                name: .logoutWebView,
+                object: nil
+            )
+
+            NotificationCenter.default.addObserver(
+                self,
                 selector: #selector(loadCurrentDomain),
                 name: .loadCurrentDomain,
                 object: nil
@@ -86,6 +93,10 @@ struct WebView: NSViewRepresentable {
 
         @objc private func debugLayout() {
             debugMessengerLayout()
+        }
+
+        @objc private func logout() {
+            logoutWebView()
         }
 
         @objc private func loadCurrentDomain() {
@@ -336,6 +347,19 @@ struct WebView: NSViewRepresentable {
             """
 
             webView?.evaluateJavaScript(script)
+        }
+
+        private func logoutWebView() {
+            let dataStore = WKWebsiteDataStore.default()
+            let dataTypes = WKWebsiteDataStore.allWebsiteDataTypes()
+
+            dataStore.fetchDataRecords(ofTypes: dataTypes) { records in
+                dataStore.removeData(ofTypes: dataTypes, for: records) {
+                    Task { @MainActor in
+                        self.webView?.reload()
+                    }
+                }
+            }
         }
 
         private func debugMessengerLayout() {
